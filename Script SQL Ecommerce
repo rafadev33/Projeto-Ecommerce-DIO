@@ -1,0 +1,158 @@
+-- criação do banco de dados
+CREATE DATABASE ecommerce;
+USE ecommerce;
+
+-- criando tabela cliente
+CREATE TABLE Cliente (
+    idCliente INT NOT NULL AUTO_INCREMENT,
+    pnome VARCHAR(10),
+    nmeioinicial VARCHAR(3),
+    sobrenome VARCHAR(20),
+    cpf CHAR(11),
+    endereco VARCHAR(45),
+    datanascimento DATE,
+    PRIMARY KEY (idCliente)
+);
+
+-- criando tabela pedido
+CREATE TABLE Pedido (
+    idPedido INT NOT NULL AUTO_INCREMENT,
+    status ENUM('Em Andamento', 'Processando', 'Enviado', 'Entregue') DEFAULT('Processando'),
+    descricao VARCHAR(45),
+    PRIMARY KEY (idPedido)
+);
+
+-- criando tabela produto
+CREATE TABLE Produto (
+    idProduto INT NOT NULL AUTO_INCREMENT,
+    categoria VARCHAR(45),
+    descricao VARCHAR(45),
+    valor DECIMAL(10,2),
+    PRIMARY KEY (idProduto)
+);
+
+-- criando tabela estoque
+CREATE TABLE Estoque (
+    idEstoque INT NOT NULL AUTO_INCREMENT,
+    idProduto INT NOT NULL,
+    quantidade INT NOT NULL,
+    PRIMARY KEY (idEstoque),
+    FOREIGN KEY (idProduto) REFERENCES Produto(idProduto)
+);
+
+-- criando tabela terceiro vendedor
+CREATE TABLE TerceiroVendedor (
+    idTerceiroVendedor INT NOT NULL AUTO_INCREMENT,
+    razaoSocial VARCHAR(45),
+    endereco VARCHAR(45),
+    nomeFantasia VARCHAR(45),
+    cnpj CHAR(14),
+    PRIMARY KEY (idTerceiroVendedor)
+);
+
+-- criando tabela fornecedor
+CREATE TABLE Fornecedor (
+    idFornecedor INT NOT NULL AUTO_INCREMENT,
+    razaoSocial VARCHAR(45),
+    endereco VARCHAR(45),
+    nomeFantasia VARCHAR(45),
+    cnpj CHAR(14),
+    PRIMARY KEY (idFornecedor)
+);
+
+-- criando tabela formas de pagamento
+CREATE TABLE FormasDePagamento (
+    idFormasDePagamento INT NOT NULL AUTO_INCREMENT,
+    cartaoCredito DECIMAL(10,2),
+    pix DECIMAL(10,2),
+    ted DECIMAL(10,2),
+    boleto DECIMAL(10,2),
+    PRIMARY KEY (idFormasDePagamento)
+);
+
+
+-- populando o banco
+
+ALTER TABLE Cliente AUTO_INCREMENT = 1;
+ALTER TABLE Cliente ADD CONSTRAINT unique_cpf_cliente UNIQUE (CPF);
+
+
+INSERT INTO Cliente (pnome, nmeioinicial, sobrenome, cpf, endereco, datanascimento) VALUES
+('Adam', 'R', 'Carvalho', '87543929898', 'Rodovia Augusto Montenegro', '1985-11-19'),
+('Railane', 'A', 'Carvalho', '87543439898', 'Rodovia Augusto Montenegro', '1995-01-02'),
+('Johann', 'A', 'Carvalho', '45543929898', 'Rodovia Augusto Montenegro', '2021-03-20'),
+('Rafael', 'M', 'Carvalho', '65543929898', 'Rodovia Augusto Montenegro', '1985-11-19'),
+('Benjamin', 'R', 'Carvalho', '87653022989', 'Rodovia Augusto Montenegro', '2015-05-21'),
+('Bárbara', 'R', 'Carvalho', '34543929898', 'Rodovia Augusto Montenegro', '2017-08-02');
+
+
+ALTER TABLE Produto AUTO_INCREMENT = 1;
+ALTER TABLE Produto ADD CONSTRAINT unique_idProduto UNIQUE (idProduto);
+
+INSERT INTO Produto (categoria, descricao, valor) VALUES
+('Vestuário', 'Camiseta', '19.99'),
+('Cama', 'Edredom', '119.99'),
+('Mesa', 'Jogo Americano', '9.99'),
+('Banho', 'Roupão', '49.99'),
+('Calçado', 'Tênis', '199.99');
+
+
+ALTER TABLE Fornecedor AUTO_INCREMENT = 1;
+
+INSERT INTO Fornecedor (razaoSocial, endereco, nomeFantasia, cnpj) VALUES
+('Maria Confecção LTDA', 'Rua Parajú 173 Ulianópolis-PA', 'Moda Mariazinha', '23457609812387'),
+('Aline Representações LTDA', 'BR 316 Americano-PA', 'Absolut Empreendimentos', '09837421938274'),
+('Rita Silveira LTDA', 'Rua Parajú 173 Dom Eliseu-PA', 'Rita Variedades', '95047609812387'),
+('Railane Enterprise', 'Passagem Pau DArco 05 Ananindeua-PA', 'Railane Calçados', '23457940112387'),
+('Raimundo Variedades', 'Rua Parajú 173 Pragominas-PA', 'RaiMundão do 10', '89765609812387');
+
+
+INSERT INTO TerceiroVendedor (razaoSocial, endereco, nomeFantasia, cnpj) VALUES
+('Maria Moda LTDA', 'Rua Parajú 173 Ulianópolis-PA', 'Moda Mariazinha', '23457098812387'),
+('Aline Empreendimentos LTDA', 'BR 316 Americano-PA', 'Absolut Empreendimentos', '07657421938274'),
+('Rita Comércio LTDA', 'Rua Parajú 173 Dom Eliseu-PA', 'Rita Variedades', '95047609812387'),
+('Railane International Co', 'Passagem Pau DArco 05 Ananindeua-PA', 'Railane Calçados', '23445640112387'),
+('Raimundo Comércio Varejista', 'Rua Parajú 173 Pragominas-PA', 'RaiMundão do 10', '89432609812387');
+
+
+INSERT INTO Estoque (idProduto, quantidade) VALUES
+(1, 45),
+(2, 60),
+(3, 50),
+(4, 35),
+(5, 85);
+
+
+--Querys
+
+SELECT sobrenome, datanascimento FROM Cliente;
+SELECT sobrenome, pnome FROM Cliente;
+SELECT IdCliente, pnome, sobrenome, cpf FROM Cliente ORDER BY IdCliente;
+SELECT IdCliente, pnome, sobrenome, cpf FROM Cliente ORDER BY cpf;
+SELECT IdCliente AS Identificador, pnome AS Primeiro_Nome, sobrenome AS Sobrenome, cpf AS CPF FROM Cliente ORDER BY IdCliente DESC;
+
+SELECT idEstoque, quantidade,
+CASE
+    WHEN quantidade > 50 THEN 'A quantidade é maior que 50'
+    WHEN quantidade = 50 THEN 'A quantidade é 50'
+    ELSE 'A quantidade é menor que 50'
+END AS Quantidade_Estoque
+FROM Estoque;
+
+SELECT idProduto, valor,
+CASE
+    WHEN valor > 75 THEN 'O valor é maior que 75'
+    WHEN valor = 75 THEN 'O valor é 75'
+    ELSE 'O valor é menor que 75'
+END AS Valor_Produto
+FROM Produto;
+
+SELECT Produto.IdProduto, Produto.descricao, Estoque.quantidade, Produto.valor AS Preco_Unitario
+FROM Produto
+INNER JOIN Estoque
+ON Produto.IdProduto=Estoque.IdProduto;
+
+SELECT Produto.IdProduto, Produto.descricao, Estoque.quantidade, Produto.valor AS Preco_Unitario
+FROM Produto
+INNER JOIN Estoque
+ON Produto.IdProduto=Estoque.IdProduto HAVING valor >= 49.99;
